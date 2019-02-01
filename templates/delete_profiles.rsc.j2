@@ -1,0 +1,17 @@
+{% if mikrotik_ipsec['delete_all_profiles'] == true %}
+# Delete ALL profiles
+/ip ipsec peer profile remove [/ip ipsec peer profile find where !(default=yes)]
+
+{% endif %}
+
+{% if mikrotik_ipsec['profiles'][0] is defined %}
+# Delete not defined profiles
+/ip ipsec peer profile remove [/ip ipsec peer profile find where !(default=yes) and !( \
+{% for profile in mikrotik_ipsec['profiles'] %}
+{% if not loop.first %} or {% endif %} (name="Ansible managed: [{{ profile['name'] }}]")  \
+{% endfor %}
+)]
+
+# End delete not defined profiles
+
+{% endif %}

@@ -1,0 +1,20 @@
+
+{% if mikrotik_ipsec['mode_configs'][0] is defined %}
+# Сreate mode configs
+
+{% for m_config in mikrotik_ipsec['mode_configs'] %}
+:if ([/ip ipsec mode-config find name="Ansible managed: [{{ m_config['name'] }}]" ] = "" ) do={
+  # Create a new mode_config {{ m_config['name'] }}
+  /ip ipsec mode-config add name="Ansible managed: [{{ m_config['name'] }}]"
+}
+# Set parameters for mode config
+/ip ipsec mode-config set [/ip ipsec mode-config find name="Ansible managed: [{{ m_config['name'] }}]" ] \
+{% if m_config['responder'] is defined %}responder="{{ m_config['responder'] | bool | ternary('yes', 'no') }}" {% endif %}
+{% if m_config['src-address-list'] is defined %} src-address-list="{{ m_config['src-address-list'] }}" {% endif %}
+
+# End set parameters
+{% endfor %}
+
+
+# End delete not defined mode configs
+{% endif %}

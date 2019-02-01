@@ -1,0 +1,60 @@
+
+{% if mikrotik_ipsec['policies'][0] is defined %}
+# Create new policies
+{% for policy in mikrotik_ipsec['policies'] %}
+:if ( [/ip ipsec policy find where ( \
+comment="Ansible managed: [{{ policy['comment'] }}]" \
+{% if policy['action'] is defined %} and action="{{ policy['action'] }}" {% endif %}
+{% if policy['disabled'] is defined %} and disabled="{{ policy['disabled'] | bool | ternary('yes', 'no') }}" {% endif %}
+{% if policy['group'] is defined %} and group="Ansible managed: [{{ policy['group'] }}]" {% endif %}
+{% if policy['place-before'] is defined %} and place-before="{{ policy['place-before'] }}" {% endif %}
+{% if policy['sa-dst-address'] is defined %} and sa-dst-address="{{ policy['sa-dst-address'] }}" {% endif %}
+{% if policy['src-port'] is defined %} and src-port="{{ policy['src-port'] }}" {% endif %}
+{% if policy['dst-address'] is defined %} and dst-address="{{ policy['dst-address'] }}" {% endif %}
+{% if policy['ipsec-protocols'] is defined %} and ipsec-protocols="{{ policy['ipsec-protocols'] }}" {% endif %}
+{% if policy['proposal'] is defined %} and proposal="{{ policy['proposal'] }}" {% endif %}
+{% if policy['sa-src-address'] is defined %} and sa-src-address="{{ policy['sa-src-address'] }}" {% endif %}
+{% if policy['template'] is defined %} and template="{{ policy['template'] | bool | ternary('yes', 'no') }}" {% endif %}
+{% if policy['copy-from'] is defined %} and copy-from="{{ policy['copy-from'] }}" {% endif %}
+{% if policy['dst-port'] is defined %} and dst-port="{{ policy['dst-port'] }}" {% endif %}
+{% if policy['level'] is defined %} and level="{{ policy['level'] }}" {% endif %}
+{% if policy['protocol'] is defined %} and protocol="{{ policy['protocol'] }}" {% endif %}
+{% if policy['src-address'] is defined %} and src-address="{{ policy['src-address'] }}" {% endif %}
+{% if policy['tunnel'] is defined %} and tunnel="{{ policy['tunnel'] | bool | ternary('yes', 'no') }}" {% endif %}
+)] = "" ) do={
+  # Create a new policy {{ policy['comment'] }}
+  /ip ipsec policy add comment="Ansible managed: [{{ policy['comment'] }}]" \
+  {% if policy['action'] is defined %}  action="{{ policy['action'] }}" {% endif %}
+  {% if policy['disabled'] is defined %}  disabled="{{ policy['disabled'] | bool | ternary('yes', 'no') }}" {% endif %}
+  {% if policy['group'] is defined %}  group="Ansible managed: [{{ policy['group'] }}]" {% endif %}
+  {% if policy['place-before'] is defined %}  place-before="{{ policy['place-before'] }}" {% endif %}
+  {% if policy['sa-dst-address'] is defined %}  sa-dst-address="{{ policy['sa-dst-address'] }}" {% endif %}
+  {% if policy['src-port'] is defined %}  src-port="{{ policy['src-port'] }}" {% endif %}
+  {% if policy['dst-address'] is defined %}  dst-address="{{ policy['dst-address'] }}" {% endif %}
+  {% if policy['ipsec-protocols'] is defined %}  ipsec-protocols="{{ policy['ipsec-protocols'] }}" {% endif %}
+  {% if policy['proposal'] is defined %}  proposal="{{ policy['proposal'] }}" {% endif %}
+  {% if policy['sa-src-address'] is defined %}  sa-src-address="{{ policy['sa-src-address'] }}" {% endif %}
+  {% if policy['template'] is defined %}  template="{{ policy['template'] | bool | ternary('yes', 'no') }}" {% endif %}
+  {% if policy['copy-from'] is defined %}  copy-from="{{ policy['copy-from'] }}" {% endif %}
+  {% if policy['dst-port'] is defined %}  dst-port="{{ policy['dst-port'] }}" {% endif %}
+  {% if policy['level'] is defined %}  level="{{ policy['level'] }}" {% endif %}
+  {% if policy['protocol'] is defined %}  protocol="{{ policy['protocol'] }}" {% endif %}
+  {% if policy['src-address'] is defined %}  src-address="{{ policy['src-address'] }}" {% endif %}
+  {% if policy['tunnel'] is defined %}  tunnel="{{ policy['tunnel'] | bool | ternary('yes', 'no') }}" {% endif %}
+}
+{# # Set parameters for policy {{ policy['name'] }}
+/ip ipsec policy set [/ip ipsec policy find name="{{ policy['name'] }}"] \
+name="{{ policy['name'] }}" \
+comment="Ansible managed: [{{ policy['comment'] }}]" \
+disabled="{{ policy['disabled'] | bool | ternary('yes', 'no') }}"
+{% if policy['auth-algorithms'] is defined %} and auth-algorithms="{{ policy['auth-algorithms'] }}" {% endif %}
+{% if policy['copy-from'] is defined %} and copy-from="{{ policy['copy-from'] }}" {% endif %}
+{% if policy['enc-algorithms'] is defined %} and enc-algorithms="{{ policy['enc-algorithms'] }}" {% endif %}
+{% if policy['lifetime'] is defined %} and lifetime="{{ policy['lifetime'] }}" {% endif %}
+{% if policy['pfs-group'] is defined %} and pfs-group="{{ policy['pfs-group'] }}" {% endif %}}
+
+# End set parameters for policy {{ policy['name'] }} #}
+{% endfor %}
+
+# End creating new policies
+{% endif %}

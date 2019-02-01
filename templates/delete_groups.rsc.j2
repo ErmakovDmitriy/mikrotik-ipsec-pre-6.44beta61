@@ -1,0 +1,17 @@
+{% if mikrotik_ipsec['delete_all_groups'] == true %}
+# Delete ALL policies
+/ip ipsec policy group remove [/ip ipsec policy group find where !(default=yes)]
+
+{% endif %}
+
+{% if mikrotik_ipsec['groups'][0] is defined %}
+# Delete not defined policy groups
+/ip ipsec policy group remove [/ip ipsec policy group find where !(default=yes) and !( \
+{% for group in mikrotik_ipsec['groups'] %}
+{% if not loop.first %} or {% endif %} (\
+name="Ansible managed: [{{ group['name'] }}]" and comment="Ansible managed: [{{ group['comment'] }}]") \
+{% endfor %}
+)]
+
+# End delete not defined policy groups
+{% endif %}

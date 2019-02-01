@@ -1,0 +1,30 @@
+---
+  - name: Generate ipsec template ipsec-{{inventory_hostname}}.rsc to import ipsec
+    template: src=ipsec_full.rsc.j2 dest={{role_path}}/files/tmp/ipsec-{{inventory_hostname}}.rsc
+    delegate_to: localhost
+    tags: ["role::mikrotik::IPv4_IPsec", "role::mikrotik::IPv4_IPsec::generate_script_local"]
+
+  - name: Send ipsec-{{inventory_hostname}}.rsc script
+    command: scp -P {{ansible_port}} {{role_path}}/files/tmp/ipsec-{{inventory_hostname}}.rsc {{ansible_user}}@{{ansible_host}}:/ipsec-{{inventory_hostname}}.rsc
+    delegate_to: localhost
+    tags: ["role::mikrotik::IPv4_IPsec"]
+
+  - name: Delete temporary ipsec-{{inventory_hostname}}.rsc file
+    file: path={{role_path}}/files/tmp/ipsec-{{inventory_hostname}}.rsc state=absent
+    delegate_to: localhost
+    tags: ["role::mikrotik::IPv4_IPsec"]
+
+  - name: Run ipsec-{{inventory_hostname}}.rsc on router
+    routeros_command:
+      commands:  "/import ipsec-{{inventory_hostname}}.rsc"
+    register: mikrotik_ipsec_out
+    failed_when: mikrotik_ipsec_out['stdout_lines'][0][-1] is not search('Script file loaded and executed successfully')
+    tags: ["role::mikrotik::IPv4_IPsec"]
+
+  - name: Remove ipsec-{{inventory_hostname}}.rsc from router
+    routeros_command:
+      commands:  "/file remove ipsec-{{inventory_hostname}}.rsc"
+    register: mikrotik_ipsec_out_delete_out
+    failed_when: mikrotik_ipsec_out_delete_out['stdout_lines'][0][-1] is search('no such item')
+    when: mikrotik_ipsec.delete_ipsec_on_target_router
+    tags: ["role::mikrotik::IPv4_IPsec"]

@@ -1,0 +1,20 @@
+
+{% if mikrotik_ipsec['groups'][0] is defined %}
+# Create new groups
+{% for group in mikrotik_ipsec['groups'] %}
+:if ( [/ip ipsec policy group find where ( name="{{ group['name'] }}" )] = "" ) do={
+  # Create a new group {{ group['name'] }}
+  /ip ipsec policy group add name="Ansible managed: [{{ group['name'] }}]"
+}
+{#
+# Set parameters for group {{ group['name'] }}
+/ip ipsec policy group set [/ip ipsec policy group find name="Ansible managed: [{{ group['name'] }}]"] \
+name="Ansible managed: [{{ group['name'] }}]" \
+comment="Ansible managed: [{{ group['comment'] }}]" \
+#}
+
+# End set parameters for group {{ group['name'] }}
+{% endfor %}
+
+# End creating new groups
+{% endif %}

@@ -1,0 +1,15 @@
+{% if mikrotik_ipsec['delete_all_mode_configs'] == true %}
+# Delete ALL policies
+/ip ipsec mode-config remove [/ip ipsec mode-config find where !(default=yes)]
+{% endif %}
+
+{% if mikrotik_ipsec['mode_configs'][0] is defined %}
+# Delete not defined mode configs
+/ip ipsec mode-config remove [/ip ipsec mode-config find where !(default=yes) and !( \
+{% for m_config in mikrotik_ipsec['mode_configs'] %}
+{% if not loop.first %} or {% endif %} ( name="Ansible managed: [{{ m_config['name'] }}]") \
+{% endfor %}
+)]
+
+# End delete not defined mode configs
+{% endif %}

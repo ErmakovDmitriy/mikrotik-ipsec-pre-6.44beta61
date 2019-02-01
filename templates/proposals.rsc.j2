@@ -1,0 +1,24 @@
+
+{% if mikrotik_ipsec['proposals'][0] is defined %}
+# Create new proposals
+{% for proposal in mikrotik_ipsec['proposals'] %}
+:if ( [/ip ipsec proposal find where ( name="{{ proposal['name'] }}" )] = "" ) do={
+  # Create a new proposal {{ proposal['name'] }}
+  /ip ipsec proposal add name="{{ proposal['name'] }}"
+}
+# Set parameters for proposal {{ proposal['name'] }}
+/ip ipsec proposal set [/ip ipsec proposal find name="{{ proposal['name'] }}"] \
+name="{{ proposal['name'] }}" \
+comment="Ansible managed: [{{ proposal['comment'] }}]" \
+disabled="{{ proposal['disabled'] | bool | ternary('yes', 'no') }}" \
+{% if proposal['auth-algorithms'] is defined %} auth-algorithms="{{ proposal['auth-algorithms'] }}" {% endif %}
+{% if proposal['copy-from'] is defined %} copy-from="{{ proposal['copy-from'] }}" {% endif %}
+{% if proposal['enc-algorithms'] is defined %} enc-algorithms="{{ proposal['enc-algorithms'] }}" {% endif %}
+{% if proposal['lifetime'] is defined %} lifetime="{{ proposal['lifetime'] }}" {% endif %}
+{% if proposal['pfs-group'] is defined %} pfs-group="{{ proposal['pfs-group'] }}" {% endif %}
+
+# End set parameters for proposal {{ proposal['name'] }}
+{% endfor %}
+
+# End creating new proposals
+{% endif %}

@@ -1,0 +1,32 @@
+
+{% if mikrotik_ipsec['identities'][0] is defined %}
+# Create new identities
+{% for identity in mikrotik_ipsec['identities'] %}
+:if ( [/ip ipsec identity find where ( peer="{{ identity['peer'] }}" )] = "" ) do={
+  # Create a new identity {{ identity['peer'] }}
+  /ip ipsec identity add peer="{{ identity['peer'] }}" auth-method="pre-shared-key" secret="{{ lookup('password', '/dev/null length=63') }}"
+}
+# Set parameters for identity {{ identity['peer'] }}
+/ip ipsec identity set [/ip ipsec identity find peer="{{ identity['peer'] }}"] \
+peer="{{ identity['peer'] }}" \
+{% if identity['auth-method'] is defined %} auth-method="{{ identity['auth-method'] }}" {% endif %}
+{% if identity['copy-from'] is defined %} copy-from="{{ identity['copy-from'] }}" {% endif %}
+{% if identity['key'] is defined %} key="{{ identity['key'] }}" {% endif %}
+{% if identity['my-id'] is defined %} my-id="{{ identity['my-id'] }}" {% endif %}
+{% if identity['policy-template-group'] is defined %} policy-template-group="Ansible managed: [{{ identity['policy-template-group'] }}]" {% endif %}
+{% if identity['remote-id'] is defined %} remote-id="{{ identity['remote-id'] }}" {% endif %}
+{% if identity['secret'] is defined %} secret="{{ identity['secret'] }}" {% endif %}
+{% if identity['xauth-password'] is defined %} xauth-password="{{ identity['xauth-password'] }}" {% endif %}
+{% if identity['certificate'] is defined %} certificate="{{ identity['certificate'] }}" {% endif %}
+{% if identity['generate-policy'] is defined %} generate-policy="{{ identity['generate-policy'] }}" {% endif %}
+{% if identity['mode-config'] is defined %} mode-config="{{ identity['mode-config'] }}" {% endif %}
+{% if identity['notrack-chain'] is defined %} notrack-chain="{{ identity['notrack-chain'] }}" {% endif %}
+{% if identity['remote-certificate'] is defined %} remote-certificate="{{ identity['remote-certificate'] }}" {% endif %}
+{% if identity['remote-key'] is defined %} remote-key="{{ identity['remote-key'] }}" {% endif %}
+{% if identity['xauth-login'] is defined %} xauth-login="{{ identity['xauth-login'] }}" {% endif %}
+
+# End set parameters for identity {{ identity['peer'] }}
+{% endfor %}
+
+# End creating new identities
+{% endif %}

@@ -1,0 +1,26 @@
+{% if mikrotik_ipsec['profiles'][0] is defined %}
+# Create new profiles
+{% for profile in mikrotik_ipsec['profiles'] %}
+:if ( [/ip ipsec peer profile find where ( name="Ansible managed: [{{ profile['name'] }}]" )] = "" ) do={
+  # Create a new profile {{ profile['name'] }}
+  /ip ipsec peer profile add name="Ansible managed: [{{ profile['name'] }}]"
+}
+# Set parameters for profile {{ profile['name'] }}
+/ip ipsec peer profile set [/ip ipsec peer profile find name="Ansible managed: [{{ profile['name'] }}]"] \
+name="Ansible managed: [{{ profile['name'] }}]" \
+{% if profile['copy-from'] is defined %} copy-from="{{  profile['copy-from']  }}" {% endif %}
+{% if profile['dpd-interval'] is defined %} dpd-interval="{{  profile['dpd-interval']  }}" {% endif %}
+{% if profile['enc-algorithm'] is defined %} enc-algorithm="{{  profile['enc-algorithm']  }}" {% endif %}
+{% if profile['lifebytes'] is defined %} lifebytes="{{  profile['lifebytes']  }}" {% endif %}
+{% if profile['nat-traversal'] is defined %} nat-traversal="{{  profile['nat-traversal'] | bool | ternary('yes', 'no') }}" {% endif %}
+{% if profile['dh-group'] is defined %} dh-group="{{  profile['dh-group']  }}" {% endif %}
+{% if profile['dpd-maximum-failures'] is defined %} dpd-maximum-failures="{{  profile['dpd-maximum-failures']  }}" {% endif %}
+{% if profile['hash-algorithm'] is defined %} hash-algorithm="{{  profile['hash-algorithm']  }}" {% endif %}
+{% if profile['lifetime'] is defined %} lifetime="{{  profile['lifetime']  }}" {% endif %}
+{% if profile['proposal-check'] is defined %} proposal-check="{{  profile['proposal-check']  }}" {% endif %}
+
+# End set parameters for profile {{ profile['name'] }}
+{% endfor %}
+
+# End creating new profiles
+{% endif %}

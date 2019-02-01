@@ -1,0 +1,18 @@
+mikrotik_ipsec:
+  delete_all_groups: false
+  delete_all_identities: false
+  delete_all_mode_configs: false
+  delete_all_peers: false
+  delete_all_policies: false
+  delete_all_profiles: false
+  delete_all_proposals: false
+
+  delete_ipsec_on_target_router: true
+
+  groups: []
+  identities: []
+  mode_configs: []
+  peers: []
+  policies: []
+  profiles: []
+  proposals: []

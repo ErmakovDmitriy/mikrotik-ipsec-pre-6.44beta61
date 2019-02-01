@@ -1,0 +1,15 @@
+{% if mikrotik_ipsec['delete_all_identities'] == true %}
+# Delete ALL identities
+/ip ipsec identity remove [/ip ipsec identity find]
+{% endif %}
+
+{% if mikrotik_ipsec['identities'][0] is defined %}
+# Delete not defined identities
+/ip ipsec identity remove [/ip ipsec identity find where !( \
+{% for identity in mikrotik_ipsec['identities'] %}
+{% if not loop.first %} or {% endif %} (peer="Ansible managed: [{{ identity['peer'] }}]") \
+{% endfor %}
+)]
+
+# End delete not defined identitys
+{% endif %}

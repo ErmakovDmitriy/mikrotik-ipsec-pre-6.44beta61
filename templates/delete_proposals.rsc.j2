@@ -1,0 +1,18 @@
+{% if mikrotik_ipsec['delete_all_proposals'] == true %}
+# Delete ALL proposals
+/ip ipsec proposal remove [/ip ipsec proposal find where !(default=yes)]
+
+# Disable default proposals
+/ip ipsec proposal set [/ip ipsec proposal find where (default=yes)] disabled=yes
+{% endif %}
+
+{% if mikrotik_ipsec['proposals'][0] is defined %}
+# Delete not defined proposals
+/ip ipsec proposal remove [/ip ipsec proposal find where !(default=yes) and !( \
+{% for proposal in mikrotik_ipsec['proposals'] %}
+{% if not loop.first %} or {% endif %} ( name="{{ proposal['name'] }}" )  \
+{% endfor %}
+)]
+
+# End delete not defined proposals
+{% endif %}

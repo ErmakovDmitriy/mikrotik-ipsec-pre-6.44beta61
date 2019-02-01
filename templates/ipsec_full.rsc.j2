@@ -1,0 +1,58 @@
+# Delete peers
+{% include "delete_peers.rsc.j2" %}
+
+# Delete profiles
+{% include "delete_profiles.rsc.j2" %}
+
+{# Unused before RouterOS 6.44beta61
+# Delete identitiers
+{% include "delete_identities.rsc.j2" %} #}
+
+# Delete policies
+{% include "delete_policy.rsc.j2" %}
+
+# Delete policy groups
+{% include "delete_groups.rsc.j2" %}
+
+# Delete profiles
+{% include "delete_profiles.rsc.j2" %}
+
+# Delete mode configs
+{% include "delete_mode_configs.rsc.j2" %}
+
+# Delete proposals
+{% include "delete_proposals.rsc.j2" %}
+
+# Delete keys
+{% include "delete_keys.rsc.j2" %}
+
+
+
+# Create keys
+{% include "keys.rsc.j2" %}
+
+# Create proposals
+{% include "proposals.rsc.j2" %}
+
+# Create mode configs
+{% include "mode_configs.rsc.j2" %}
+
+# Create profiles
+{% include "profiles.rsc.j2" %}
+
+# Create policy groups
+{% include "groups.rsc.j2" %}
+
+# Create policies
+{% include "policy.rsc.j2" %}
+
+# Create profiles
+{% include "profiles.rsc.j2" %}
+
+# Create ipsec peers
+{% include "peers.rsc.j2" %}
+
+{# Unused before RouterOS 6.44beta61
+# Create identifiers
+{% include "identities.rsc.j2" %}
+#}

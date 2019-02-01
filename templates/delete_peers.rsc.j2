@@ -1,0 +1,21 @@
+{% if mikrotik_ipsec['delete_all_peers'] == true %}
+# Delete ALL peers
+/ip ipsec peer remove [/ip ipsec peer find]
+{% endif %}
+
+{% if mikrotik_ipsec['peers'][0] is defined %}
+# Delete not defined peers
+/ip ipsec peer remove [/ip ipsec peer find where !( \
+{% for peer in mikrotik_ipsec['peers'] %}
+{% set addr = namespace(address=none) %}
+{% if peer['name'] is search('/') == true %}
+{% set addr.address = peer['name'] %}
+{% else %}
+{% set addr.address = peer['name'] + '/32' %}
+{% endif %}
+{% if not loop.first %} or {% endif %} (address="{{ addr.address }}")  \
+{% endfor %}
+)]
+
+# End delete not defined peers
+{% endif %}

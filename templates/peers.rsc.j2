@@ -1,0 +1,55 @@
+
+{% if mikrotik_ipsec['peers'][0] is defined %}
+# Create new peers
+{% for peer in mikrotik_ipsec['peers'] %}
+{% set addr = namespace(address=none) %}
+{% if peer['name'] is search('/') == true %}
+{% set addr.address = peer['name'] %}
+{% else %}
+{% set addr.address = peer['name'] + '/32' %}
+{% endif %}
+:if ( [/ip ipsec peer find where ( address="{{ addr.address }}" )] = "" ) do={
+  # Create a new peer {{ addr.address }}
+  /ip ipsec peer add address="{{ addr.address }}"
+}
+
+# Set parameters for peer {{ peer['name'] }}
+/ip ipsec peer set [/ip ipsec peer find address="{{ addr.address }}"] \
+address="{{ addr.address }}" \
+comment="Ansible managed: [{{ peer['comment'] }}]" \
+disabled="{{ peer['disabled'] | bool | ternary('yes', 'no') }}" \
+{% if peer['copy-from'] is defined %} and copy-from="{{ peer['copy-from'] }}" {% endif %}
+{% if peer['exchange-mode'] is defined %} exchange-mode="{{ peer['exchange-mode'] }}" {% endif %}
+{% if peer['local-address'] is defined %} local-address="{{ peer['local-address'] }}" {% endif %}
+{% if peer['passive'] is defined %} passive="{{ peer['passive']  | bool | ternary('yes', 'no') }}" {% endif %}
+{% if peer['port'] is defined %} port="{{ peer['port'] }}" {% endif %}
+{% if peer['profile'] is defined %} profile="Ansible managed: [{{ peer['profile'] }}]" {% endif %}
+{% if peer['send-initial-contact'] is defined %} send-initial-contact="{{ peer['send-initial-contact'] | bool | ternary('yes', 'no') }}" {% endif %}
+{% if peer['compatibility-options'] is defined %} compatibility-options="{{ peers['compatibility-options'] }}" {% endif %}
+{# Below are the same parameters as in versions above 6.44beta61 in identity #}
+{% set identity = namespace(identity=none) %}
+{% for idnt in mikrotik_ipsec['identities'] %}
+{% if idnt['peer'] == peer['name'] %}
+{% set identity.identity = idnt%}
+{% endif %}
+{% endfor %}
+{% if identity.identity['my-id'] is defined %} my-id="{{ identity.identity['my-id'] }}" {% endif %}
+{% if identity.identity['secret'] is defined %} secret="{{ identity.identity['secret'] }}" {% endif %}
+{% if identity.identity['xauth-password'] is defined %} xauth-password="{{ identity.identity['xauth-password'] }}" {% endif %}
+{% if identity.identity['auth-method'] is defined %} auth-method="{{ identity.identity['auth-method'] }}" {% endif %}
+{% if identity.identity['notrack-chain'] is defined %} notrack-chain="{{ identity.identity['notrack-chain'] }}" {% endif %}
+{% if identity.identity['policy-template-group'] is defined %} policy-template-group="Ansible managed: [{{ identity.identity['policy-template-group'] }}]" {% endif %}
+{% if identity.identity['remote-certificate'] is defined %} remote-certificate="{{ identity.identity['remote-certificate'] }}" {% endif %}
+{% if identity.identity['certificate'] is defined %} certificate="{{ identity.identity['certificate'] }}" {% endif %}
+{% if identity.identity['generate-policy'] is defined %} generate-policy="{{ identity.identity['generate-policy'] }}" {% endif %}
+{% if identity.identity['mode-config'] is defined %} mode-config="{{ identity.identity['mode-config'] }}" {% endif %}
+{% if identity.identity['xauth-login'] is defined %} xauth-login="{{ identity.identity['xauth-login'] }}" {% endif %}
+
+
+
+
+# End set parameters for peer {{ peer['name'] }}
+{% endfor %}
+
+# End creating new peers
+{% endif %}

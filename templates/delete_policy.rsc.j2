@@ -1,0 +1,36 @@
+{% if mikrotik_ipsec['delete_all_policies'] == true %}
+# Delete ALL policies
+/ip ipsec policy remove [/ip ipsec policy find where !(default=yes)]
+
+# Set default - disabled
+/ip ipsec policy set [/ip ipsec policy find default=yes] disabled=yes
+{% endif %}
+
+{% if mikrotik_ipsec['policies'][0] is defined %}
+# Delete not defined policies
+/ip ipsec policy remove [/ip ipsec policy find where !(default=yes) and !( \
+{% for policy in mikrotik_ipsec['policies'] %}
+{% if not loop.first %} or {% endif %} (\
+comment="Ansible managed: [{{ policy['comment'] }}]" \
+{% if policy['action'] is defined %} and action="{{ policy['action'] }}" {% endif %}
+{% if policy['disabled'] is defined %} and disabled={{ policy['disabled'] | bool | ternary('yes', 'no') }} {% endif %}
+{% if policy['group'] is defined %} and group="Ansible managed: [{{ policy['group'] }}]" {% endif %}
+{% if policy['place-before'] is defined %} and place-before="{{ policy['place-before'] }}" {% endif %}
+{% if policy['sa-dst-address'] is defined %} and sa-dst-address="{{ policy['sa-dst-address'] }}" {% endif %}
+{% if policy['src-port'] is defined %} and src-port="{{ policy['src-port'] }}" {% endif %}
+{% if policy['dst-address'] is defined %} and dst-address="{{ policy['dst-address'] }}" {% endif %}
+{% if policy['ipsec-protocols'] is defined %} and ipsec-protocols="{{ policy['ipsec-protocols'] }}" {% endif %}
+{% if policy['proposal'] is defined %} and proposal="{{ policy['proposal']}}" {% endif %}
+{% if policy['sa-src-address'] is defined %} and sa-src-address="{{ policy['sa-src-address'] }}" {% endif %}
+{% if policy['template'] is defined %} and template="{{ policy['template'] | bool | ternary('yes', 'no') }}" {% endif %}
+{% if policy['copy-from'] is defined %} and copy-from="{{ policy['copy-from'] }}" {% endif %}
+{% if policy['dst-port'] is defined %} and dst-port="{{ policy['dst-port'] }}" {% endif %}
+{% if policy['level'] is defined %} and level="{{ policy['level'] }}" {% endif %}
+{% if policy['protocol'] is defined %} and protocol="{{ policy['protocol'] }}" {% endif %}
+{% if policy['src-address'] is defined %} and src-address="{{ policy['src-address'] }}" {% endif %}
+{% if policy['tunnel'] is defined %} and tunnel="{{ policy['tunnel'] | bool | ternary('yes', 'no') }}" {% endif %}) \
+{% endfor %}
+)]
+
+# End delete not defined policies
+{% endif %}
